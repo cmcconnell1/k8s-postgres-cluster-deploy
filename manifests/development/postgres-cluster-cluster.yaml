@@ -1,0 +1,63 @@
+# ref: https://github.com/zalando/postgres-operator/blob/v1.1.0/manifests/complete-postgres-manifest.yaml
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+
+metadata:
+  name: postgres-cluster
+  namespace: postgres-operator
+spec:
+  init_containers:
+  - name: date
+    image: busybox
+    command: [ "/bin/date" ]
+  teamId: "postgres"
+  volume:
+    size: 100Gi
+  numberOfInstances: 2
+  users: #Application/Robot users
+    root:
+    - superuser
+    - createdb
+  enableMasterLoadBalancer: true
+  enableReplicaLoadBalancer: true
+  allowedSourceRanges: # load balancers' source ranges for both master and replica services
+  #- 10.1.0.0/14      # AWS us-west-1 & us-west-2
+  #- 172.30.0.0/15    # pritunl IP access
+  #- 98.242.33.114/32 # cmcc
+  - 10.1.0.0/14
+  - 
+  - 
+  databases:
+    test: my-app
+    my-app: my-app
+    keycloak: my-app
+#Expert section
+  enableShmVolume: true
+  postgresql:
+    version: "10"
+    parameters:
+      shared_buffers: "32MB"
+      max_connections: "450"
+      log_statement: "all"
+      # refer to kube docs: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
+      #resources:
+      #  requests:
+      #    cpu: TODO Unlimted for now refactor as needed
+      #    memory: TODO Unlimted for now
+      #  limits:
+      #    cpu: TODO Unlimited for now
+      #    memory: TODO Unlimited for now
+  patroni:
+    initdb:
+      encoding: "UTF8"
+      locale: "en_US.C"
+      data-checksums: "true"
+    pg_hba:
+    - hostssl all all 0.0.0.0/0 md5
+    - host    all all 0.0.0.0/0 md5
+    ttl: 30
+    loop_wait: &loop_wait 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 33554432
+  maintenanceWindows:
+  - Sat:08:00-09:00

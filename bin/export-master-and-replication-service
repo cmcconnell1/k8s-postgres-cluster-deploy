@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+export KUBE_NAMESPACE=$1
+export PG_CLUSTER_NAME=$2
+
+# Note set namespace kube context via kubens or modify to use aliases, etc.
+#kubens $KUBE_NAMESPACE
+
+export MASTER_SERVICE=$(kubectl describe service/${PG_CLUSTER_NAME} -n ${KUBE_NAMESPACE} | grep 'LoadBalancer Ingress:' | awk -F ":" '{print $2}' | sed 's/ //g')
+printf "\nMASTER_SERVICE: ${MASTER_SERVICE}\n"
+
+export REPL_SERVICE=$(kubectl describe service/${PG_CLUSTER_NAME}-repl -n ${KUBE_NAMESPACE} | grep 'LoadBalancer Ingress:' | awk -F ":" '{print $2}' | sed 's/ //g')
+printf "\nREPL_SERVICE: $REPL_SERVICE\n"

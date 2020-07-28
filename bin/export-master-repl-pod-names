@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+export KUBE_NAMESPACE=$1
+export PG_CLUSTER_NAME=$2
+
+# Note set namespace kube context via kubens or modify to use aliases, etc.
+#kubens $KUBE_NAMESPACE
+
+export PGMASTER_POD=$(kubectl -n ${KUBE_NAMESPACE} get pods -o jsonpath={.items..metadata.name} -l application=spilo,version=${PG_CLUSTER_NAME},spilo-role=master)
+printf "\nPGMASTER: $PGMASTER_POD\n"
+
+export PGREPLICA_POD=$(kubectl -n ${KUBE_NAMESPACE} get pods -o jsonpath={.items..metadata.name} -l application=spilo,version=${PG_CLUSTER_NAME},spilo-role=replica)
+printf "PGREPLICA: $PGREPLICA_POD\n"
