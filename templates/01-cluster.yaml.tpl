@@ -23,7 +23,7 @@ spec:
   allowedSourceRanges: # load balancers' source ranges for both master and replica services
   #- 10.1.0.0/14      # AWS us-west-1 & us-west-2
   #- 172.30.0.0/15    # pritunl IP access
-  #- 98.242.33.114/32 # cmcc
+  #- 1.2.3.4/32 # devops-admin
   - __POSTGRES_ALLOWED_SOURCE_RANGE1__
   - __POSTGRES_ALLOWED_SOURCE_RANGE2__
   - __POSTGRES_ALLOWED_SOURCE_RANGE3__
